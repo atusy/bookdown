@@ -1,8 +1,15 @@
 #' @rdname html_document2
+#' @param global_refs Whether to number cross-referenced items globally
+#'  or by sections. This option is provided especially for `word_document2` with
+#'  the `reference_docx` option that supports supports `number_sections`-like
+#'  feature. In that case, avoid duplicates of section numbers by specifying
+#'  `FALSE` to the `number_sections` and `global_refs` arguments.
+#'
 #' @export
 markdown_document2 = function(
   number_sections = TRUE, fig_caption = TRUE, md_extensions = NULL,
-  pandoc_args = NULL, ..., base_format = rmarkdown::md_document
+  pandoc_args = NULL, ..., base_format = rmarkdown::md_document,
+  global_refs = !number_sections
 ) {
   from = rmarkdown::from_rmarkdown(fig_caption, md_extensions)
 
@@ -14,7 +21,7 @@ markdown_document2 = function(
   config$pre_processor = function(metadata, input_file, ...) {
     # Pandoc does not support numbered sections for Word, so figures/tables have
     # to be numbered globally from 1 to n
-    process_markdown(input_file, from, pandoc_args, !number_sections)
+    process_markdown(input_file, from, pandoc_args, global_refs)
     if (is.function(pre)) pre(metadata, input_file, ...)
   }
   post = config$post_processor
